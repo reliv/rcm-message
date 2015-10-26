@@ -1,0 +1,33 @@
+{
+  "name": "rcm/message",
+  "description": "ZF2 module for create and alerting users with messages",
+  "type": "library",
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "rcm",
+    "module",
+    "zf2",
+    "message"
+  ],
+  "minimum-stability": "stable",
+  "homepage": "https://github.com/reliv/rcm-message",
+  "authors": [
+    {
+      "name": "James Jervis",
+      "email": "jjervis@relivinc.com",
+      "homepage": "https://github.com/reliv"
+    }
+  ],
+  "require": {
+    "php": ">=5.5",
+    "zendframework/zendframework": "2.*",
+    "doctrine/doctrine-orm-module": "0.*",
+    "rwoverdijk/assetmanager": "1.*",
+    "rcm/user": "0.*",
+  },
+  "autoload": {
+    "psr-4": {
+      "RcmMessage\\": "src/"
+    }
+  }
+}
