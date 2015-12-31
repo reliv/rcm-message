@@ -23,7 +23,7 @@
     "zendframework/zendframework": "2.*",
     "doctrine/doctrine-orm-module": "0.*",
     "rwoverdijk/assetmanager": "1.*",
-    "rcm/user": "0.*"
+    "rcm/user": "1.*"
   },
   "autoload": {
     "psr-4": {
