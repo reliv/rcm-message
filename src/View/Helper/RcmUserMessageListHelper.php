@@ -44,6 +44,9 @@ class RcmUserMessageListHelper extends AbstractHelper
      */
     protected $translator;
 
+    /**
+     * @var \HTMLPurifier
+     */
     protected $htmlPurifier;
 
     /**
@@ -143,10 +146,10 @@ class RcmUserMessageListHelper extends AbstractHelper
               <span aria-hidden="true">&times;</span>
               </button>
               <span class="subject">
-              ' . $this->htmlPurifier->purify($messageSubject) . ':
+              xxx' . $this->htmlPurifier->purify($this->translator->translate($messageSubject)) . ':
               </span>
               <span class="body">
-              ' . $this->htmlPurifier->purify($messageBody) . '
+              ' . $this->htmlPurifier->purify($this->translator->translate($messageBody)) . '
               </span>
             </div>
             ';
