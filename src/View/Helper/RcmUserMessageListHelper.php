@@ -1,6 +1,5 @@
 <?php
 
-
 namespace RcmMessage\View\Helper;
 
 use RcmMessage\Entity\Message as MessageEntity;
@@ -137,6 +136,13 @@ class RcmUserMessageListHelper extends AbstractHelper
             $cssName = $this->getCssName($message->getLevel());
             $messageSubject = $message->getSubject();
             $messageBody = $message->getMessage();
+
+            $separator = ':';
+
+            if (empty(trim($messageSubject)) || empty(trim($messageBody))) {
+                $separator = '';
+            }
+
             $messageHtml
                 .= '
             <div class="alert' . $cssName . '" ng-hide="hiddenUserMessageIds[\''
@@ -146,7 +152,7 @@ class RcmUserMessageListHelper extends AbstractHelper
               <span aria-hidden="true">&times;</span>
               </button>
               <span class="subject">
-              ' . $this->htmlPurifier->purify($this->translator->translate($messageSubject)) . ':
+              ' . $this->htmlPurifier->purify($this->translator->translate($messageSubject)) . $separator . '
               </span>
               <span class="body">
               ' . $this->htmlPurifier->purify($this->translator->translate($messageBody)) . '
