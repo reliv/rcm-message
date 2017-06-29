@@ -34,9 +34,9 @@ class RcmUserMessageListHelperFactory
         }
 
         $userMessageRepo = $container->get('Doctrine\ORM\EntityManager')->getRepository(
-            '\RcmMessage\Entity\UserMessage'
+            \RcmMessage\Entity\UserMessage::class
         );
-        $rcmUserService = $container->get('RcmUser\Service\RcmUserService');
+        $rcmUserService = $container->get(\RcmUser\Service\RcmUserService::class);
         $translator = $container->get('MvcTranslator');
 
         return new RcmUserMessageListHelper(
