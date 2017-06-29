@@ -2,10 +2,8 @@
 
 namespace RcmMessage\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Rcm\Entity\ApiBase;
-use Zend\Form\Element\DateTime;
+use Rcm\Entity\AbstractApiModel;
 
 /**
  * Class Message
@@ -26,7 +24,7 @@ use Zend\Form\Element\DateTime;
  * )
  *
  */
-class Message extends ApiBase
+class Message extends AbstractApiModel
 {
     const LEVEL_DEFAULT = 16;
 
@@ -246,11 +244,11 @@ class Message extends ApiBase
     }
 
     /**
-     * toArray
+     * @param array $ignore
      *
      * @return array
      */
-    public function toArray()
+    public function toArray($ignore = [])
     {
         $array = get_object_vars($this);
 

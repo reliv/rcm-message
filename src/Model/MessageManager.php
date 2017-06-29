@@ -1,17 +1,4 @@
 <?php
-/**
- * MessageMgr.php
- *
- * PHP version 5
- *
- * @category  Reliv
- * @package   RcmMessage\Model
- * @author    Rod Mcnew <rmcnew@relivinc.com>
- * @copyright 2014 Reliv International
- * @license   License.txt New BSD License
- * @version   GIT: <git_id>
- * @link      https://github.com/reliv
- */
 
 namespace RcmMessage\Model;
 

@@ -1,11 +1,8 @@
 <?php
 
-
 namespace RcmMessage\View\Helper;
 
-use RcmMessage\Repository\UserMessage;
 use RcmMessage\Entity\Message as MessageEntity;
-use RcmUser\Service\RcmUserService;
 use Zend\View\Helper\AbstractHelper;
 
 /**

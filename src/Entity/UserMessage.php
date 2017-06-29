@@ -3,7 +3,7 @@
 namespace RcmMessage\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Rcm\Entity\ApiBase;
+use Rcm\Entity\AbstractApiModel;
 
 /**
  * Class Destination
@@ -23,7 +23,7 @@ use Rcm\Entity\ApiBase;
  *     name="rcm_message_user_message"
  * )
  */
-class UserMessage extends ApiBase
+class UserMessage extends AbstractApiModel
 {
     /**
      * @var int $id
@@ -211,12 +211,13 @@ class UserMessage extends ApiBase
     }
 
     /**
-     * toArray
+     * @param array $ignore
      *
      * @return array
      */
-    public function toArray()
-    {
+    public function toArray(
+        $ignore = []
+    ) {
         $array = get_object_vars($this);
 
         $array['dateViewed'] = $this->getDateViewedString();

@@ -1,12 +1,11 @@
 <?php
 
-
 namespace RcmMessage\Factory;
 
+use Interop\Container\ContainerInterface;
 use RcmMessage\View\Helper\RcmUserMessageListHelper;
-use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-
+use Zend\View\HelperPluginManager;
 
 /**
  * Class RcmUserMessageListHelperFactory
@@ -21,22 +20,30 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  * @version   Release: <package_version>
  * @link      https://github.com/reliv
  */
-class RcmUserMessageListHelperFactory implements FactoryInterface
+class RcmUserMessageListHelperFactory
 {
-
-    public function createService(ServiceLocatorInterface $mgr)
+    /**
+     * @param ContainerInterface|ServiceLocatorInterface|HelperPluginManager $container
+     *
+     * @return RcmUserMessageListHelper
+     */
+    public function __invoke($container)
     {
-        $serviceLocator = $mgr->getServiceLocator();
+        if ($container instanceof HelperPluginManager) {
+            $container = $container->getServiceLocator();
+        }
 
-        $userMessageRepo = $serviceLocator->get('Doctrine\ORM\EntityManager')->getRepository('\RcmMessage\Entity\UserMessage');
-        $rcmUserService = $serviceLocator->get('RcmUser\Service\RcmUserService');
-        $translator = $serviceLocator->get('MvcTranslator');
+        $userMessageRepo = $container->get('Doctrine\ORM\EntityManager')->getRepository(
+            \RcmMessage\Entity\UserMessage::class
+        );
+        $rcmUserService = $container->get(\RcmUser\Service\RcmUserService::class);
+        $translator = $container->get('MvcTranslator');
 
         return new RcmUserMessageListHelper(
             $userMessageRepo,
             $rcmUserService,
             $translator,
-            $serviceLocator->get('RcmHtmlPurifier')
+            $container->get('RcmHtmlPurifier')
         );
     }
 }

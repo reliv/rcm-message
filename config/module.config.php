@@ -3,15 +3,6 @@
  * Config
  */
 return [
-    'service_manager' => [
-        'config_factories' => [
-            'RcmMessage\Model\MessageManager' => [
-                'arguments' => [
-                    'Doctrine\Orm\EntityManager'
-                ]
-            ]
-        ]
-    ],
     /**
      *
      */
@@ -33,6 +24,34 @@ return [
     /**
      *
      */
+    'controllers' => [
+        'invokables' => [
+            \RcmMessage\Controller\MessageListController::class => \RcmMessage\Controller\MessageListController::class,
+            \RcmMessage\Controller\ApiUserMessageController::class => \RcmMessage\Controller\ApiUserMessageController::class,
+        ],
+    ],
+    /**
+     *
+     */
+    'doctrine' => array(
+        'driver' => array(
+            'RcmMessage' => array(
+                'class' => \Doctrine\ORM\Mapping\Driver\AnnotationDriver::class,
+                'cache' => 'array',
+                'paths' => array(
+                    __DIR__ . '/../src/Entity',
+                )
+            ),
+            'orm_default' => array(
+                'drivers' => array(
+                    'RcmMessage' => 'RcmMessage'
+                )
+            )
+        )
+    ),
+    /**
+     *
+     */
     'router' => [
         'routes' => [
             'RcmMessageList' => [
@@ -40,7 +59,7 @@ return [
                 'options' => [
                     'route' => '/my-system-messages',
                     'defaults' => [
-                        'controller' => 'RcmMessage\Controller\MessageListController',
+                        'controller' => \RcmMessage\Controller\MessageListController::class,
                         'action' => 'index',
                         'messageFilters' => [
                             'source' => null,
@@ -56,7 +75,7 @@ return [
                 'options' => [
                     'route' => '/api/message/user/:userId/message[/:id]',
                     'defaults' => [
-                        'controller' => 'RcmMessage\Controller\ApiUserMessageController',
+                        'controller' => \RcmMessage\Controller\ApiUserMessageController::class,
                     ]
                 ],
             ],
@@ -65,21 +84,24 @@ return [
     /**
      *
      */
-    'controllers' => [
-        'invokables' => [
-            'RcmMessage\Controller\MessageListController' => 'RcmMessage\Controller\MessageListController',
-            'RcmMessage\Controller\ApiUserMessageController' => 'RcmMessage\Controller\ApiUserMessageController',
-        ],
+    'service_manager' => [
+        'config_factories' => [
+            \RcmMessage\Model\MessageManager::class => [
+                'arguments' => [
+                    'Doctrine\Orm\EntityManager'
+                ]
+            ]
+        ]
     ],
     /**
      *
      */
     'view_helpers' => [
         'factories' => [
-            'rcmMessageUserMessageList' => 'RcmMessage\Factory\RcmUserMessageListHelperFactory',
+            'rcmMessageUserMessageList' => \RcmMessage\Factory\RcmUserMessageListHelperFactory::class,
         ],
         'invokables' => [
-            'rcmMessageFlashMessageList' => 'RcmMessage\View\Helper\RcmFlashMessageListHelper',
+            'rcmMessageFlashMessageList' => \RcmMessage\View\Helper\RcmFlashMessageListHelper::class,
         ],
     ],
     /**
@@ -103,23 +125,4 @@ return [
             'ViewJsonStrategy',
         ],
     ],
-    /**
-     *
-     */
-    'doctrine' => array(
-        'driver' => array(
-            'RcmMessage' => array(
-                'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
-                'cache' => 'array',
-                'paths' => array(
-                    __DIR__ . '/../src/Entity',
-                )
-            ),
-            'orm_default' => array(
-                'drivers' => array(
-                    'RcmMessage' => 'RcmMessage'
-                )
-            )
-        )
-    ),
 ];
