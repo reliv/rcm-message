@@ -22,7 +22,7 @@
     "php": ">=5.5",
     "doctrine/doctrine-orm-module": "0.* || 1.*",
     "rcm/user": "1.*",
-    "rcm/core": "^1.20",
+    "rcm/core": "^1.20.0",
     "rwoverdijk/assetmanager": "1.*",
     "zendframework/zend-i18n": "2.*",
     "zendframework/zend-mvc": "2.*",
