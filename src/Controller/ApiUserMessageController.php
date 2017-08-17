@@ -1,12 +1,13 @@
 <?php
 
-
 namespace RcmMessage\Controller;
 
+use Rcm\Acl\ResourceName;
 use Rcm\Http\Response;
 use Rcm\View\Model\ApiJsonModel;
 use RcmMessage\Entity\Message;
 use RcmMessage\Entity\UserMessage;
+use RcmUser\Service\RcmUserService;
 use Zend\Mvc\Controller\AbstractRestfulController;
 
 /**
@@ -79,10 +80,12 @@ class ApiUserMessageController extends AbstractRestfulController
         if ($currentUser->getId() == $userId) {
             return true;
         }
+        /** @var RcmUserService $rcmUserService */
+        $rcmUserService = $this->serviceLocator->get(RcmUserService::class);
 
         //ACCESS CHECK if not current user
-        return $this->rcmIsAllowed(
-            'sites',
+        return $rcmUserService->isAllowed(
+            ResourceName::RESOURCE_SITES,
             'admin'
         );
     }
@@ -96,6 +99,7 @@ class ApiUserMessageController extends AbstractRestfulController
     {
         if (!$this->canAccess()) {
             $this->getResponse()->setStatusCode(Response::STATUS_CODE_401);
+
             return $this->getResponse();
         }
 
@@ -123,6 +127,7 @@ class ApiUserMessageController extends AbstractRestfulController
     {
         if (!$this->canAccess()) {
             $this->getResponse()->setStatusCode(Response::STATUS_CODE_401);
+
             return $this->getResponse();
         }
 
@@ -141,8 +146,9 @@ class ApiUserMessageController extends AbstractRestfulController
             ]
         );
 
-        if(empty($message)){
+        if (empty($message)) {
             $this->getResponse()->setStatusCode(Response::STATUS_CODE_404);
+
             return new ApiJsonModel($message, 404, 'Not Found');
         }
 
@@ -158,11 +164,16 @@ class ApiUserMessageController extends AbstractRestfulController
      */
     public function create($data)
     {
-        if (!$this->rcmIsAllowed(
-            'sites',
+        /** @var RcmUserService $rcmUserService */
+        $rcmUserService = $this->serviceLocator->get(RcmUserService::class);
+
+        if (!$rcmUserService->isAllowed(
+            ResourceName::RESOURCE_SITES,
             'admin'
-        )) {
+        )
+        ) {
             $this->getResponse()->setStatusCode(Response::STATUS_CODE_401);
+
             return $this->getResponse();
         }
 
@@ -186,10 +197,10 @@ class ApiUserMessageController extends AbstractRestfulController
 
         $entityManager = $this->getEntityManager();
 
-        try{
+        try {
             $entityManager->persist($newUserMessage);
             $entityManager->flush();
-        } catch(\Exception $e){
+        } catch (\Exception $e) {
             return new ApiJsonModel(null, 1, $e->getMessage());
         }
 
@@ -208,6 +219,7 @@ class ApiUserMessageController extends AbstractRestfulController
     {
         if (!$this->canAccess()) {
             $this->getResponse()->setStatusCode(Response::STATUS_CODE_401);
+
             return $this->getResponse();
         }
 
@@ -226,8 +238,9 @@ class ApiUserMessageController extends AbstractRestfulController
             ]
         );
 
-        if(empty($message)){
+        if (empty($message)) {
             $this->getResponse()->setStatusCode(Response::STATUS_CODE_404);
+
             return new ApiJsonModel($message, 404, 'Not Found');
         }
 
@@ -235,10 +248,10 @@ class ApiUserMessageController extends AbstractRestfulController
 
         $entityManager = $this->getEntityManager();
 
-        try{
+        try {
             $entityManager->persist($message);
             $entityManager->flush();
-        } catch(\Exception $e){
+        } catch (\Exception $e) {
             return new ApiJsonModel(null, 1, $e->getMessage());
         }
 
