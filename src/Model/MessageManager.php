@@ -68,7 +68,7 @@ class MessageManager
     public function removeUserMessagesBySource($userId, $source)
     {
         $userMessages = $this->entityMgr
-            ->getRepository('RcmMessage\Entity\UserMessage')
+            ->getRepository(\RcmMessage\Entity\UserMessage::class)
             ->findBy(['userId' => $userId]);
         foreach ($userMessages as $userMessage) {
             $message = $userMessage->getMessage();
