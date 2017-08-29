@@ -43,7 +43,7 @@ class ApiUserMessageController extends AbstractRestfulController
     protected function getUserMessageRepository()
     {
         return $this->getEntityManager()->getRepository(
-            '\RcmMessage\Entity\UserMessage'
+            \RcmMessage\Entity\UserMessage::class
         );
     }
 
