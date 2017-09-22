@@ -263,6 +263,6 @@ class ApiUserMessageController extends AbstractRestfulController
             return new ApiJsonModel([], 1, $e->getMessage());
         }
 
-        return new ApiJsonModel($message->toArray();
+        return new ApiJsonModel($message->toArray());
     }
 }
