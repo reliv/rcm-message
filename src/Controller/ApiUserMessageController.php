@@ -113,7 +113,13 @@ class ApiUserMessageController extends AbstractRestfulController
 
         $messages = $userMessageRepo->findBy(['userId' => $userId]);
 
-        return new ApiJsonModel($messages);
+        $results = [];
+        /** @var Message $message */
+        foreach ($messages as $message) {
+            $results[] = $message->toArray();
+        }
+
+        return new ApiJsonModel($results);
     }
 
     /**
@@ -139,6 +145,7 @@ class ApiUserMessageController extends AbstractRestfulController
                 null
             );
 
+        /** @var Message $message */
         $message = $userMessageRepo->findOneBy(
             [
                 'id' => $id,
@@ -149,10 +156,10 @@ class ApiUserMessageController extends AbstractRestfulController
         if (empty($message)) {
             $this->getResponse()->setStatusCode(Response::STATUS_CODE_404);
 
-            return new ApiJsonModel($message, 404, 'Not Found');
+            return new ApiJsonModel($message->toArray(), 404, 'Not Found');
         }
 
-        return new ApiJsonModel($message);
+        return new ApiJsonModel($message->toArray());
     }
 
     /**
@@ -201,10 +208,10 @@ class ApiUserMessageController extends AbstractRestfulController
             $entityManager->persist($newUserMessage);
             $entityManager->flush();
         } catch (\Exception $e) {
-            return new ApiJsonModel(null, 1, $e->getMessage());
+            return new ApiJsonModel([], 1, $e->getMessage());
         }
 
-        return new ApiJsonModel($newUserMessage);
+        return new ApiJsonModel($newUserMessage->toArray());
     }
 
     /**
@@ -231,6 +238,7 @@ class ApiUserMessageController extends AbstractRestfulController
                 null
             );
 
+        /** @var Message $message */
         $message = $userMessageRepo->findOneBy(
             [
                 'id' => $id,
@@ -241,7 +249,7 @@ class ApiUserMessageController extends AbstractRestfulController
         if (empty($message)) {
             $this->getResponse()->setStatusCode(Response::STATUS_CODE_404);
 
-            return new ApiJsonModel($message, 404, 'Not Found');
+            return new ApiJsonModel($message->toArray(), 404, 'Not Found');
         }
 
         $message->populate($data, ['id', 'dateViewed', 'message']);
@@ -252,9 +260,9 @@ class ApiUserMessageController extends AbstractRestfulController
             $entityManager->persist($message);
             $entityManager->flush();
         } catch (\Exception $e) {
-            return new ApiJsonModel(null, 1, $e->getMessage());
+            return new ApiJsonModel([], 1, $e->getMessage());
         }
 
-        return new ApiJsonModel($message);
+        return new ApiJsonModel($message->toArray();
     }
 }
