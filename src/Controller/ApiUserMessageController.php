@@ -7,21 +7,13 @@ use Rcm\Http\Response;
 use Rcm\View\Model\ApiJsonModel;
 use RcmMessage\Entity\Message;
 use RcmMessage\Entity\UserMessage;
+use RcmUser\Api\Authentication\GetIdentity;
+use RcmUser\Api\GetPsrRequest;
 use RcmUser\Service\RcmUserService;
 use Zend\Mvc\Controller\AbstractRestfulController;
 
 /**
- * Class ApiUserMessageController
- *
- * PHP version 5
- *
- * @category  Reliv
- * @package   RcmMessage\Controller
- * @author    James Jervis <jjervis@relivinc.com>
- * @copyright 2015 Reliv International
- * @license   License.txt New BSD License
- * @version   Release: <package_version>
- * @link      https://github.com/reliv
+ * @author James Jervis - https://github.com/jerv13
  */
 class ApiUserMessageController extends AbstractRestfulController
 {
@@ -50,11 +42,18 @@ class ApiUserMessageController extends AbstractRestfulController
     /**
      * getCurrentUser
      *
-     * @return \RcmUser\User\Entity\User
+     * @return \RcmUser\User\Entity\UserInterface
      */
     protected function getCurrentUser()
     {
-        return $this->rcmUserGetCurrentUser();
+        /** @var GetIdentity $getIdentity */
+        $getIdentity = $this->serviceLocator->get(GetIdentity::class);
+
+        $psrRequest = GetPsrRequest::invoke();
+
+        return $getIdentity->__invoke(
+            $psrRequest
+        );
     }
 
     /**
