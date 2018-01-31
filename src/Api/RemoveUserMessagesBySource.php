@@ -7,5 +7,15 @@ namespace RcmMessage\Api;
  */
 interface RemoveUserMessagesBySource
 {
-
+    /**
+     * @param string $userId
+     * @param string $source
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function __invoke(
+        $userId,
+        $source
+    );
 }

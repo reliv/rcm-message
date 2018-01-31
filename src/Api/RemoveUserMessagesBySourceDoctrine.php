@@ -3,6 +3,7 @@
 namespace RcmMessage\Api;
 
 use Doctrine\ORM\EntityManager;
+use RcmMessage\Entity\UserMessageInterface;
 
 /**
  * @author James Jervis - https://github.com/jerv13
@@ -23,17 +24,17 @@ class RemoveUserMessagesBySourceDoctrine implements RemoveUserMessagesBySource
     }
 
     /**
-     * @param $userId
-     * @param $source
+     * @param string $userId
+     * @param string $source
      *
      * @return void
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Exception
      */
     public function __invoke(
         $userId,
         $source
     ) {
-        /** @var UserMe $userMessages */
+        /** @var UserMessageInterface[] $userMessages */
         $userMessages = $this->entityMgr
             ->getRepository(\RcmMessage\Entity\UserMessage::class)
             ->findBy(['userId' => $userId]);
