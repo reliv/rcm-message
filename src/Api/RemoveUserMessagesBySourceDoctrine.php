@@ -45,6 +45,7 @@ class RemoveUserMessagesBySourceDoctrine implements RemoveUserMessagesBySource
                 $this->entityMgr->remove($userMessage);
             }
         }
-        $this->entityMgr->flush([$message, $userMessage]);
+
+        $this->entityMgr->flush($userMessages);
     }
 }

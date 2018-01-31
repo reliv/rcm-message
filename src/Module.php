@@ -16,6 +16,7 @@ use RcmMessage\Api\GetServerRequestRcmUser;
 use RcmMessage\Api\IsAllowedRcmUserSitesAdmin;
 use RcmMessage\Api\PrepareMessageForDisplay;
 use RcmMessage\Api\PrepareMessageForDisplayCompositeFactory;
+use RcmMessage\Api\PrepareMessageForDisplayMessageParams;
 use RcmMessage\Api\PrepareMessageForDisplayPurifyHtml;
 use RcmMessage\Api\PrepareMessageForDisplayTranslatorZf;
 use RcmMessage\Api\RemoveUserMessagesBySource;
@@ -103,6 +104,7 @@ class Module
             ),
             'rcm-message-prepare-message-services' => [
                 PrepareMessageForDisplayPurifyHtml::class => -10, // should always be last
+                PrepareMessageForDisplayMessageParams::class => 5, // should always be after translate
                 PrepareMessageForDisplayTranslatorZf::class => 10, // should always be near last
             ],
             /**
@@ -178,6 +180,8 @@ class Module
                     PrepareMessageForDisplay::class => [
                         'factory' => PrepareMessageForDisplayCompositeFactory::class,
                     ],
+
+                    PrepareMessageForDisplayMessageParams::class => [],
 
                     PrepareMessageForDisplayPurifyHtml::class => [
                         'arguments' => [
