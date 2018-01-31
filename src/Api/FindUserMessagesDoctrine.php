@@ -1,46 +1,47 @@
 <?php
 
-namespace RcmMessage\Repository;
+namespace RcmMessage\Api;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NoResultException;
+use RcmMessage\Entity\UserMessage;
 
 /**
- * @deprecated
- *
- * @category  Reliv
- * @package   RcmMessage
- * @author    James Jervis <jjervis@relivinc.com>
- * @copyright 2015 Reliv International
- * @license   License.txt New BSD License
- * @version   Release: <package_version>
- * @link      https://github.com/reliv
+ * @author James Jervis - https://github.com/jerv13
  */
-class UserMessage extends EntityRepository
+class FindUserMessagesDoctrine implements FindUserMessages
 {
+    protected $entityManager;
+
     /**
-     * @deprecated use RcmMessage\Api\FindUserMessages
-     *
+     * @param EntityManager $entityManager
+     */
+    public function __construct(
+        EntityManager $entityManager
+    ) {
+        $this->entityManager = $entityManager;
+    }
+
+    /**
      * @param string      $userId    User Id to display message form
      * @param string|null $source    Source identifier or null to ignore
-     * @param string|null $level     Level (see UserMessage entity for static values) or null to ignore
-     * @param string|null $hasViewed If user has viewed the message or null to ignore
+     * @param int|null    $level     Level (see UserMessage entity for static values) or null to ignore
+     * @param bool|null   $hasViewed If user has viewed the message or null to ignore
      *
-     * @return array|ArrayCollection
+     * @return array
      */
-    public function getMessages(
+    public function __invoke(
         $userId,
         $source = null,
         $level = null,
         $hasViewed = null
-    ) {
+    ): array {
         $level = $this->getIntNullValue($level);
         $hasViewed = $this->getBoolNullValue($hasViewed);
 
-        $queryBuilder = $this->_em->createQueryBuilder();
+        $queryBuilder = $this->entityManager->createQueryBuilder();
         $queryBuilder->select('userMessage');
-        $queryBuilder->from('\RcmMessage\Entity\UserMessage', 'userMessage');
+        $queryBuilder->from(UserMessage::class, 'userMessage');
         $queryBuilder->join('userMessage.message', 'message');
         $queryBuilder->where('userMessage.userId = :userId');
         $queryBuilder->setParameter('userId', $userId);
@@ -107,40 +108,5 @@ class UserMessage extends EntityRepository
         }
 
         return (bool)(int)$var;
-    }
-
-    /**
-     * getUserMessages
-     *
-     * @param string $userId
-     * @param string $source
-     * @param string $level
-     *
-     * @return ArrayCollection
-     */
-    public function getMessage(
-        $userId,
-        $messageId,
-        $source = null,
-        $level = null
-    ) {
-        // @todo
-    }
-
-    /**
-     * getUserMessages
-     *
-     * @param string $userId
-     * @param string $source
-     * @param string $level
-     *
-     * @return ArrayCollection
-     */
-    public function hasMessages(
-        $userId,
-        $source = null,
-        $level = null
-    ) {
-        // @todo
     }
 }

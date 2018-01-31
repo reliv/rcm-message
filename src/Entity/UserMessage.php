@@ -3,13 +3,9 @@
 namespace RcmMessage\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Rcm\Entity\AbstractApiModel;
+use Reliv\RcmApiLib\Model\AbstractApiModel;
 
 /**
- * Class Destination
- *
- * PHP version 5
- *
  * @category  Reliv
  * @package   RcmMessage\Entity
  * @author    James Jervis <jjervis@relivinc.com>
@@ -23,7 +19,7 @@ use Rcm\Entity\AbstractApiModel;
  *     name="rcm_message_user_message"
  * )
  */
-class UserMessage extends AbstractApiModel
+class UserMessage extends AbstractApiModel implements UserMessageInterface
 {
     /**
      * @var int $id
@@ -53,8 +49,6 @@ class UserMessage extends AbstractApiModel
     protected $message;
 
     /**
-     * __construct
-     *
      * @param $userId
      */
     public function __construct($userId = null)
@@ -63,8 +57,6 @@ class UserMessage extends AbstractApiModel
     }
 
     /**
-     * getId
-     *
      * @return int
      */
     public function getId()
@@ -73,8 +65,6 @@ class UserMessage extends AbstractApiModel
     }
 
     /**
-     * setId
-     *
      * @param $id
      *
      * @return void
@@ -85,8 +75,6 @@ class UserMessage extends AbstractApiModel
     }
 
     /**
-     * getUserId
-     *
      * @return string
      */
     public function getUserId()
@@ -95,8 +83,6 @@ class UserMessage extends AbstractApiModel
     }
 
     /**
-     * setUserId
-     *
      * @param $userId
      *
      * @return void
@@ -107,9 +93,7 @@ class UserMessage extends AbstractApiModel
     }
 
     /**
-     * getMessage
-     *
-     * @return Message
+     * @return MessageInterface
      */
     public function getMessage()
     {
@@ -117,9 +101,7 @@ class UserMessage extends AbstractApiModel
     }
 
     /**
-     * setMessage
-     *
-     * @param Message $message
+     * @param MessageInterface $message
      *
      * @return void
      */
@@ -129,8 +111,6 @@ class UserMessage extends AbstractApiModel
     }
 
     /**
-     * setViewed
-     *
      * @param bool $viewed
      *
      * @return void
@@ -148,8 +128,6 @@ class UserMessage extends AbstractApiModel
     }
 
     /**
-     * hasViewed
-     *
      * @return bool
      */
     public function hasViewed()
@@ -158,8 +136,6 @@ class UserMessage extends AbstractApiModel
     }
 
     /**
-     * getDateViewed
-     *
      * @return \DateTime
      */
     public function getDateViewed()
@@ -168,11 +144,9 @@ class UserMessage extends AbstractApiModel
     }
 
     /**
-     * setDateViewed
-     *
      * @param $dateViewed
      *
-     * @return \DateTime
+     * @return void
      */
     public function setDateViewed($dateViewed)
     {
@@ -183,7 +157,7 @@ class UserMessage extends AbstractApiModel
     }
 
     /**
-     * setDateViewedString - from ISO8601 string
+     * from ISO8601 string
      *
      * @param $dateViewed
      *
@@ -197,8 +171,6 @@ class UserMessage extends AbstractApiModel
     }
 
     /**
-     * getDateViewedString
-     *
      * @return null|string
      */
     public function getDateViewedString()

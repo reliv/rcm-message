@@ -2,10 +2,11 @@
 
 namespace RcmMessage\View\Helper;
 
+use RcmMessage\Api\FindUserMessages;
+use RcmMessage\Api\GetCurrentUserId;
+use RcmMessage\Api\GetServerRequest;
+use RcmMessage\Api\RenderUserMessages;
 use RcmMessage\Entity\Message as MessageEntity;
-use RcmMessage\Repository\UserMessage;
-use RcmUser\Service\RcmUserService;
-use Zend\I18n\Translator\TranslatorInterface;
 use Zend\View\Helper\AbstractHelper;
 
 /**
@@ -23,58 +24,30 @@ use Zend\View\Helper\AbstractHelper;
  */
 class RcmUserMessageListHelper extends AbstractHelper
 {
-    /**
-     * @var string
-     */
-    protected $currentUserId = null;
+    protected $findUserMessages;
+    protected $getServerRequest;
+    protected $getCurrentUserId;
+    protected $renderUserMessages;
 
     /**
-     * @var RcmUserService
-     */
-    protected $rcmUserService;
-
-    /**
-     * @var UserMessage
-     */
-    protected $userMessageRepo;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var \HTMLPurifier
-     */
-    protected $htmlPurifier;
-
-    /**
-     * @param UserMessage         $userMessageRepo
-     * @param RcmUserService      $rcmUserService
-     * @param TranslatorInterface $translator
-     * @param \HTMLPurifier       $htmlPurifier
+     * @param FindUserMessages   $findUserMessages
+     * @param GetServerRequest   $getServerRequest
+     * @param GetCurrentUserId   $getCurrentUserId
+     * @param RenderUserMessages $renderUserMessages
      */
     public function __construct(
-        UserMessage $userMessageRepo,
-        RcmUserService $rcmUserService,
-        TranslatorInterface $translator,
-        \HTMLPurifier $htmlPurifier
+        FindUserMessages $findUserMessages,
+        GetServerRequest $getServerRequest,
+        GetCurrentUserId $getCurrentUserId,
+        RenderUserMessages $renderUserMessages
     ) {
-        $this->userMessageRepo = $userMessageRepo;
-        $this->rcmUserService = $rcmUserService;
-        $this->translator = $translator;
-        $this->htmlPurifier = $htmlPurifier;
-
-        $currentUser = $this->rcmUserService->getCurrentUser(null);
-
-        if (!empty($currentUser)) {
-            $this->currentUserId = $currentUser->getId();
-        }
+        $this->findUserMessages = $findUserMessages;
+        $this->getServerRequest = $getServerRequest;
+        $this->getCurrentUserId = $getCurrentUserId;
+        $this->renderUserMessages = $renderUserMessages;
     }
 
     /**
-     * __invoke
-     *
      * @param null|string $source
      * @param null|       $level
      * @param null|bool   $showHasViewed
@@ -90,105 +63,31 @@ class RcmUserMessageListHelper extends AbstractHelper
         $showDefaultMessage = false,
         $userId = null
     ) {
+        $serverRequest = $this->getServerRequest->__invoke();
         if (empty($userId)) {
-            $userId = $this->currentUserId;
+            $userId = $this->getCurrentUserId->__invoke(
+                $serverRequest
+            );
         }
 
         if (empty($userId)) {
             return '';
         }
 
-        $messages = $this->userMessageRepo->getMessages(
+        $messages = $this->findUserMessages->__invoke(
             $userId,
             $source,
             $level,
             $showHasViewed
         );
 
-        return $this->render(
-            $userId,
+        return $this->renderUserMessages->__invoke(
+            $serverRequest,
             $messages,
-            $showDefaultMessage
+            [
+                RenderUserMessages::OPTION_USER_ID => $userId,
+                'show-default-message' => $showDefaultMessage
+            ]
         );
-    }
-
-    /**
-     * render
-     *
-     * @param string $userId
-     * @param array  $messages
-     * @param bool   $showDefaultMessage
-     *
-     * @return string
-     */
-    protected function render(
-        $userId,
-        $messages,
-        $showDefaultMessage = false
-    ) {
-        $messageHtml = '';
-
-        $messageHtml .= '<div class="rcmMessage userMessageList" data-ng-controller="rcmMessageList">';
-
-        foreach ($messages as $userMessage) {
-            /** @var \RcmMessage\Entity\Message $message */
-            $message = $userMessage->getMessage();
-            $cssName = $this->getCssName($message->getLevel());
-            $messageSubject = $message->getSubject();
-            $messageBody = $message->getMessage();
-
-            $separator = ':';
-
-            if (empty(trim($messageSubject)) || empty(trim($messageBody))) {
-                $separator = '';
-            }
-
-            $messageHtml
-                .= '
-            <div class="alert' . $cssName . '" ng-hide="hiddenUserMessageIds[\''
-                . $userId . ':' . $userMessage->getId() . '\']" role="alert">
-              <button type="button" class="close" ng-click="dismissUserMessage('
-                . $userId . ', ' . $userMessage->getId() . ')" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-              </button>
-              <span class="subject">
-              ' . $this->htmlPurifier->purify($this->translator->translate($messageSubject)) . $separator . '
-              </span>
-              <span class="body">
-              ' . $this->htmlPurifier->purify($this->translator->translate($messageBody)) . '
-              </span>
-            </div>
-            ';
-        }
-        $messageHtml .= '</div>';
-
-        return $messageHtml;
-    }
-
-    /**
-     * getCssName
-     *
-     * @param $level
-     *
-     * @return string
-     */
-    protected function getCssName($level)
-    {
-        if (empty($level)) {
-            return ' alert-info';
-        }
-        $cssMap = [
-            MessageEntity::LEVEL_CRITICAL => ' alert-danger',
-            MessageEntity::LEVEL_ERROR => ' alert-danger',
-            MessageEntity::LEVEL_WARNING => ' alert-warning',
-            MessageEntity::LEVEL_INFO => ' alert-info',
-            MessageEntity::LEVEL_SUCCESS => ' alert-success',
-        ];
-
-        if (isset($cssMap[$level])) {
-            return $cssMap[$level];
-        }
-
-        return ' alert-info';
     }
 }

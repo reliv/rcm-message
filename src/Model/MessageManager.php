@@ -7,9 +7,7 @@ use RcmMessage\Entity\Message;
 use RcmMessage\Entity\UserMessage;
 
 /**
- * MessageMgr
- *
- * PHP version 5
+ * @deprecated Use RcmMessage\Api\
  *
  * @category  Reliv
  * @package   RcmMessage\Model
@@ -35,6 +33,7 @@ class MessageManager
     }
 
     /**
+     * @deprecated
      * Creates a new user message and adds it to the message que db
      *
      * @param string $userId
@@ -42,14 +41,25 @@ class MessageManager
      * @param string $body
      * @param string $level
      * @param string $source
+     * @param array $properties
+     *
+     * @return void
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function createUserMessage($userId, $subject, $body, $level, $source)
-    {
+    public function createUserMessage(
+        $userId,
+        $subject,
+        $body,
+        $level,
+        $source,
+        $properties = []
+    ) {
         $message = new Message();
         $message->setSubject($subject);
         $message->setMessage($body);
         $message->setLevel($level);
         $message->setSource($source);
+        $message->setProperties($properties);
         $this->entityMgr->persist($message);
         $this->entityMgr->flush($message);
 
@@ -64,6 +74,9 @@ class MessageManager
      *
      * @param string $userId
      * @param string $source
+     *
+     * @return void
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function removeUserMessagesBySource($userId, $source)
     {

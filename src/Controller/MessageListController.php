@@ -34,9 +34,7 @@ class MessageListController extends AbstractActionController
     }
 
     /**
-     * indexAction
-     *
-     * @return array
+     * @return array|ViewModel
      */
     public function indexAction()
     {

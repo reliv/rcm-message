@@ -2,58 +2,91 @@
 
 namespace RcmMessage\Controller;
 
-use Rcm\Acl\ResourceName;
+use Doctrine\ORM\EntityManager;
 use Rcm\Http\Response;
 use Rcm\View\Model\ApiJsonModel;
+use RcmMessage\Api\GetCurrentUserId;
+use RcmMessage\Api\GetServerRequest;
+use RcmMessage\Api\IsAllowed;
+use RcmMessage\Api\PrepareMessageForDisplay;
 use RcmMessage\Entity\Message;
 use RcmMessage\Entity\UserMessage;
-use RcmUser\Api\Authentication\GetIdentity;
-use RcmUser\Api\GetPsrRequest;
-use RcmUser\Service\RcmUserService;
-use Zend\Mvc\Controller\AbstractRestfulController;
+use RcmMessage\Entity\UserMessageInterface;
+use Reliv\RcmApiLib\Controller\AbstractRestfulJsonController;
 
 /**
  * @author James Jervis - https://github.com/jerv13
  */
-class ApiUserMessageController extends AbstractRestfulController
+class ApiUserMessageController extends AbstractRestfulJsonController
 {
+    protected $entityManager;
+    protected $isAllowed;
+    protected $getServerRequest;
+    protected $getCurrentUserId;
+    protected $prepareMessageForDisplay;
+    protected $isAllowedOptions;
+
+    /**
+     * @param EntityManager    $entityManager
+     * @param IsAllowed        $isAllowed
+     * @param GetServerRequest $getServerRequest
+     * @param GetCurrentUserId $getCurrentUserId
+     * @param array            $isAllowedOptions
+     */
+    public function __construct(
+        EntityManager $entityManager,
+        IsAllowed $isAllowed,
+        GetServerRequest $getServerRequest,
+        GetCurrentUserId $getCurrentUserId,
+        PrepareMessageForDisplay $prepareMessageForDisplay,
+        $isAllowedOptions = []
+    ) {
+        $this->entityManager = $entityManager;
+        $this->isAllowed = $isAllowed;
+        $this->getServerRequest = $getServerRequest;
+        $this->getCurrentUserId = $getCurrentUserId;
+        $this->prepareMessageForDisplay = $prepareMessageForDisplay;
+        $this->isAllowedOptions = $isAllowedOptions;
+    }
+
     /**
      * getEntityManager
      *
-     * @return \Doctrine\ORM\EntityManagerInterface
+     * @return \Doctrine\ORM\EntityManager
      */
     protected function getEntityManager()
     {
-        return $this->serviceLocator->get('Doctrine\ORM\EntityManager');
+        return $this->entityManager;
     }
 
     /**
      * getUserMessageRepository
      *
-     * @return \RcmMessage\Repository\UserMessage
+     * @return \RcmMessage\Repository\UserMessage|\Doctrine\ORM\EntityRepository
      */
     protected function getUserMessageRepository()
     {
-        return $this->getEntityManager()->getRepository(
+        return $this->entityManager->getRepository(
             \RcmMessage\Entity\UserMessage::class
         );
     }
 
     /**
-     * getCurrentUser
+     * @param UserMessageInterface $userMessage
+     * @param array                $options
      *
-     * @return \RcmUser\User\Entity\UserInterface
+     * @return UserMessageInterface
      */
-    protected function getCurrentUser()
-    {
-        /** @var GetIdentity $getIdentity */
-        $getIdentity = $this->serviceLocator->get(GetIdentity::class);
-
-        $psrRequest = GetPsrRequest::invoke();
-
-        return $getIdentity->__invoke(
-            $psrRequest
+    protected function prepareUserMessageForDisplay(
+        UserMessageInterface $userMessage,
+        array $options = []
+    ) {
+        $message = $this->prepareMessageForDisplay->__invoke(
+            $userMessage->getMessage()
         );
+        $userMessage->setMessage($message);
+
+        return $userMessage;
     }
 
     /**
@@ -70,22 +103,24 @@ class ApiUserMessageController extends AbstractRestfulController
                 null
             );
 
-        $currentUser = $this->getCurrentUser();
+        $serverRequest = $this->getServerRequest->__invoke();
 
-        if (empty($currentUser)) {
+        $currentUserId = $this->getCurrentUserId->__invoke(
+            $serverRequest
+        );
+
+        if (empty($currentUserId)) {
             return false;
         }
 
-        if ($currentUser->getId() == $userId) {
+        if ($currentUserId == $userId) {
             return true;
         }
-        /** @var RcmUserService $rcmUserService */
-        $rcmUserService = $this->serviceLocator->get(RcmUserService::class);
 
-        //ACCESS CHECK if not current user
-        return $rcmUserService->isAllowed(
-            ResourceName::RESOURCE_SITES,
-            'admin'
+        // ACCESS CHECK if not current user
+        return $this->isAllowed->__invoke(
+            $serverRequest,
+            $this->isAllowedOptions
         );
     }
 
@@ -110,15 +145,20 @@ class ApiUserMessageController extends AbstractRestfulController
                 null
             );
 
-        $messages = $userMessageRepo->findBy(['userId' => $userId]);
+        $userMessages = $userMessageRepo->findBy(['userId' => $userId]);
 
         $results = [];
-        /** @var Message $message */
-        foreach ($messages as $message) {
-            $results[] = $message->toArray();
+        /** @var UserMessage $userMessage */
+        foreach ($userMessages as $userMessage) {
+            $userMessage = $this->prepareUserMessageForDisplay(
+                $userMessage
+            );
+            $results[] = $userMessage->toArray();
         }
 
-        return new ApiJsonModel($results);
+        return $this->getApiResponse(
+            $results
+        );
     }
 
     /**
@@ -144,21 +184,28 @@ class ApiUserMessageController extends AbstractRestfulController
                 null
             );
 
-        /** @var Message $message */
-        $message = $userMessageRepo->findOneBy(
+        /** @var UserMessage $userMessage */
+        $userMessage = $userMessageRepo->findOneBy(
             [
                 'id' => $id,
                 'userId' => $userId
             ]
         );
 
-        if (empty($message)) {
+        if (empty($userMessage)) {
             $this->getResponse()->setStatusCode(Response::STATUS_CODE_404);
 
-            return new ApiJsonModel($message->toArray(), 404, 'Not Found');
+            return $this->getApiResponse(
+                $userMessage->toArray(),
+                404
+            );
         }
 
-        return new ApiJsonModel($message->toArray());
+        $userMessage = $this->prepareUserMessageForDisplay(
+            $userMessage
+        );
+
+        return $this->getApiResponse($userMessage->toArray());
     }
 
     /**
@@ -166,18 +213,19 @@ class ApiUserMessageController extends AbstractRestfulController
      *
      * @param mixed $data
      *
-     * @return ApiJsonModel|\Zend\Stdlib\ResponseInterface
+     * @return \Reliv\RcmApiLib\Http\ApiResponse|\Reliv\RcmApiLib\Http\ApiResponseInterface
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function create($data)
     {
-        /** @var RcmUserService $rcmUserService */
-        $rcmUserService = $this->serviceLocator->get(RcmUserService::class);
+        $serverRequest = $this->getServerRequest->__invoke();
 
-        if (!$rcmUserService->isAllowed(
-            ResourceName::RESOURCE_SITES,
-            'admin'
-        )
-        ) {
+        $allowed = $this->isAllowed->__invoke(
+            $serverRequest,
+            $this->isAllowedOptions
+        );
+
+        if (!$allowed) {
             $this->getResponse()->setStatusCode(Response::STATUS_CODE_401);
 
             return $this->getResponse();
@@ -203,14 +251,15 @@ class ApiUserMessageController extends AbstractRestfulController
 
         $entityManager = $this->getEntityManager();
 
-        try {
-            $entityManager->persist($newUserMessage);
-            $entityManager->flush();
-        } catch (\Exception $e) {
-            return new ApiJsonModel([], 1, $e->getMessage());
-        }
+        $entityManager->persist($newUserMessage);
+        $entityManager->flush($newMessage);
+        $entityManager->flush($newUserMessage);
 
-        return new ApiJsonModel($newUserMessage->toArray());
+        $newUserMessage = $this->prepareUserMessageForDisplay(
+            $newUserMessage
+        );
+
+        return $this->getApiResponse($newUserMessage->toArray());
     }
 
     /**
@@ -219,7 +268,8 @@ class ApiUserMessageController extends AbstractRestfulController
      * @param string $id
      * @param mixed  $data
      *
-     * @return ApiJsonModel|\Zend\Stdlib\ResponseInterface
+     * @return \Reliv\RcmApiLib\Http\ApiResponse|\Reliv\RcmApiLib\Http\ApiResponseInterface
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function update($id, $data)
     {
@@ -237,31 +287,31 @@ class ApiUserMessageController extends AbstractRestfulController
                 null
             );
 
-        /** @var Message $message */
-        $message = $userMessageRepo->findOneBy(
+        /** @var UserMessage $userMessage */
+        $userMessage = $userMessageRepo->findOneBy(
             [
                 'id' => $id,
                 'userId' => $userId
             ]
         );
 
-        if (empty($message)) {
+        if (empty($userMessage)) {
             $this->getResponse()->setStatusCode(Response::STATUS_CODE_404);
 
-            return new ApiJsonModel($message->toArray(), 404, 'Not Found');
+            return $this->getApiResponse($userMessage->toArray(), 404);
         }
 
-        $message->populate($data, ['id', 'dateViewed', 'message']);
+        $userMessage->populate($data, ['id', 'dateViewed', 'message']);
 
         $entityManager = $this->getEntityManager();
 
-        try {
-            $entityManager->persist($message);
-            $entityManager->flush();
-        } catch (\Exception $e) {
-            return new ApiJsonModel([], 1, $e->getMessage());
-        }
+        $entityManager->persist($userMessage);
+        $entityManager->flush($userMessage);
 
-        return new ApiJsonModel($message->toArray());
+        $userMessage = $this->prepareUserMessageForDisplay(
+            $userMessage
+        );
+
+        return $this->getApiResponse($userMessage->toArray());
     }
 }
