@@ -2,68 +2,69 @@
 
 namespace RcmMessage\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
+use Reliv\RcmApiLib\Model\AbstractApiModel;
 
 /**
- * @category  Reliv
- * @package   moduleNameHere
- * @author    James Jervis <jjervis@relivinc.com>
- * @copyright 2015 Reliv International
- * @license   License.txt New BSD License
- * @version   Release: <package_version>
- * @link      https://github.com/reliv
- *
- * @ORM\Entity (repositoryClass="RcmMessage\Repository\Message")
- * @ORM\Table (
- *     name="rcm_message_message"
- * )
+ * @author James Jervis - https://github.com/jerv13
  */
-class Message extends MessageAbstract implements MessageInterface
+abstract class MessageAbstract extends AbstractApiModel
 {
     /**
      * @var int $id
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue
      */
     protected $id;
 
     /**
      * @var string $level
-     * @ORM\Column(type="integer", nullable=false)
      */
-    protected $level = 2;
+    protected $level = MessageInterface::LEVEL_DEFAULT;
 
     /**
      * @var string $subject
-     * @ORM\Column(type="string", length=128, nullable=false)
      */
     protected $subject = '';
 
     /**
      * @var string $message
-     * @ORM\Column(type="string", length=512, nullable=false)
      */
     protected $message = '';
 
     /**
      * @var string $source
-     * @ORM\Column(type="string", length=64, nullable=true)
      */
     protected $source = null;
 
     /**
      * @var \DateTime
-     * @ORM\Column(type="datetime")
      */
     protected $dateCreated = null;
 
     /**
      * @var array
-     *
-     * @ORM\Column(type="json_array")
      */
     protected $properties = [];
+
+    /**
+     * @param int    $level
+     * @param string $subject
+     * @param string $message
+     * @param null   $source
+     * @param array  $properties
+     */
+    public function __construct(
+        $level = MessageInterface::LEVEL_DEFAULT,
+        $subject = '',
+        $message = '',
+        $source = null,
+        $properties = []
+    ) {
+        $this->setLevel($level);
+        $this->setSubject($subject);
+        $this->setMessage($message);
+        $this->setSource($source);
+        $this->setProperties($properties);
+        $this->setDateCreated(new \DateTime());
+    }
 
     /**
      * @return int
@@ -99,7 +100,7 @@ class Message extends MessageAbstract implements MessageInterface
     public function setLevel($level)
     {
         if (empty($level)) {
-            $level = self::LEVEL_DEFAULT;
+            $level = MessageInterface::LEVEL_DEFAULT;
         }
 
         $this->level = $level;
