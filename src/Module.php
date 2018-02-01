@@ -108,7 +108,8 @@ class Module
                 PrepareMessageForDisplayPurifyHtml::class => -10, // should always be last
                 PrepareMessageForDisplayMessageParams::class => 5, // should always be after translate
                 PrepareMessageForDisplayTranslatorZf::class => 10, // should always be near last
-                PrepareMessageForDisplayTranslatorZfMessageParams::class => 15 // should always be near last
+                PrepareMessageForDisplayTranslatorZfMessageParams::class => 15, // should always be near last
+                PrepareMessageForDisplayDateFormatMessageParams::class => 20,
             ],
             /**
              * router
