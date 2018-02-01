@@ -16,6 +16,7 @@ use RcmMessage\Api\GetServerRequestRcmUser;
 use RcmMessage\Api\IsAllowedRcmUserSitesAdmin;
 use RcmMessage\Api\PrepareMessageForDisplay;
 use RcmMessage\Api\PrepareMessageForDisplayCompositeFactory;
+use RcmMessage\Api\PrepareMessageForDisplayDateFormatMessageParams;
 use RcmMessage\Api\PrepareMessageForDisplayMessageParams;
 use RcmMessage\Api\PrepareMessageForDisplayPurifyHtml;
 use RcmMessage\Api\PrepareMessageForDisplayTranslatorZf;
@@ -107,7 +108,8 @@ class Module
                 PrepareMessageForDisplayPurifyHtml::class => -10, // should always be last
                 PrepareMessageForDisplayMessageParams::class => 5, // should always be after translate
                 PrepareMessageForDisplayTranslatorZf::class => 10, // should always be near last
-                PrepareMessageForDisplayTranslatorZfMessageParams::class => 15 // should always be near last
+                PrepareMessageForDisplayTranslatorZfMessageParams::class => 15, // should always be near last
+                PrepareMessageForDisplayDateFormatMessageParams::class => 20,
             ],
             /**
              * router
@@ -182,6 +184,8 @@ class Module
                     PrepareMessageForDisplay::class => [
                         'factory' => PrepareMessageForDisplayCompositeFactory::class,
                     ],
+
+                    PrepareMessageForDisplayDateFormatMessageParams::class => [],
 
                     PrepareMessageForDisplayMessageParams::class => [],
 
