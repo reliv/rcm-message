@@ -19,6 +19,7 @@ use RcmMessage\Api\PrepareMessageForDisplayCompositeFactory;
 use RcmMessage\Api\PrepareMessageForDisplayMessageParams;
 use RcmMessage\Api\PrepareMessageForDisplayPurifyHtml;
 use RcmMessage\Api\PrepareMessageForDisplayTranslatorZf;
+use RcmMessage\Api\PrepareMessageForDisplayTranslatorZfMessageParams;
 use RcmMessage\Api\RemoveUserMessagesBySource;
 use RcmMessage\Api\RemoveUserMessagesBySourceDoctrine;
 use RcmMessage\Api\RenderUserMessages;
@@ -106,6 +107,7 @@ class Module
                 PrepareMessageForDisplayPurifyHtml::class => -10, // should always be last
                 PrepareMessageForDisplayMessageParams::class => 5, // should always be after translate
                 PrepareMessageForDisplayTranslatorZf::class => 10, // should always be near last
+                PrepareMessageForDisplayTranslatorZfMessageParams::class => 15 // should always be near last
             ],
             /**
              * router
@@ -190,6 +192,12 @@ class Module
                     ],
 
                     PrepareMessageForDisplayTranslatorZf::class => [
+                        'arguments' => [
+                            'MvcTranslator'
+                        ]
+                    ],
+
+                    PrepareMessageForDisplayTranslatorZfMessageParams::class => [
                         'arguments' => [
                             'MvcTranslator'
                         ]

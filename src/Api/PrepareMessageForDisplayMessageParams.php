@@ -23,11 +23,11 @@ class PrepareMessageForDisplayMessageParams implements PrepareMessageForDisplay
     ): MessageInterface {
         $properties = $message->getProperties();
 
-        $messageParams = [];
-
-        if (array_key_exists(self::PROPERTY_MESSAGE_PARAMS, $properties)) {
-            $messageParams = (array)$properties[self::PROPERTY_MESSAGE_PARAMS];
+        if (!array_key_exists(self::PROPERTY_MESSAGE_PARAMS, $properties)) {
+            return $message;
         }
+
+        $messageParams = (array)$properties[self::PROPERTY_MESSAGE_PARAMS];
 
         $subject = $message->getSubject();
         $messageStr = $message->getMessage();
