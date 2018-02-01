@@ -16,6 +16,7 @@ use RcmMessage\Api\GetServerRequestRcmUser;
 use RcmMessage\Api\IsAllowedRcmUserSitesAdmin;
 use RcmMessage\Api\PrepareMessageForDisplay;
 use RcmMessage\Api\PrepareMessageForDisplayCompositeFactory;
+use RcmMessage\Api\PrepareMessageForDisplayDateFormatMessageParams;
 use RcmMessage\Api\PrepareMessageForDisplayMessageParams;
 use RcmMessage\Api\PrepareMessageForDisplayPurifyHtml;
 use RcmMessage\Api\PrepareMessageForDisplayTranslatorZf;
@@ -182,6 +183,8 @@ class Module
                     PrepareMessageForDisplay::class => [
                         'factory' => PrepareMessageForDisplayCompositeFactory::class,
                     ],
+
+                    PrepareMessageForDisplayDateFormatMessageParams::class => [],
 
                     PrepareMessageForDisplayMessageParams::class => [],
 
