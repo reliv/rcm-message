@@ -13,7 +13,6 @@ use RcmMessage\Api\GetCurrentUserId;
 use RcmMessage\Api\GetCurrentUserIdRcmUser;
 use RcmMessage\Api\GetServerRequest;
 use RcmMessage\Api\GetServerRequestRcmUser;
-use RcmMessage\Api\IsAllowedRcmUserSitesAdmin;
 use RcmMessage\Api\PrepareMessageForDisplay;
 use RcmMessage\Api\PrepareMessageForDisplayCompositeFactory;
 use RcmMessage\Api\PrepareMessageForDisplayDateFormatMessageParams;
@@ -173,12 +172,6 @@ class Module
 
                     GetServerRequest::class => [
                         'class' => GetServerRequestRcmUser::class,
-                    ],
-
-                    IsAllowedRcmUserSitesAdmin::class => [
-                        'arguments' => [
-                            \RcmUser\Api\Acl\IsAllowed::class
-                        ]
                     ],
 
                     PrepareMessageForDisplay::class => [
