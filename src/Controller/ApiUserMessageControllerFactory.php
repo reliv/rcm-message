@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Interop\Container\ContainerInterface;
 use RcmMessage\Api\GetCurrentUserId;
 use RcmMessage\Api\GetServerRequest;
-use RcmMessage\Api\IsAllowedRcmUserSitesAdmin;
+//use RcmMessage\Api\IsAllowedRcmUserSitesAdmin;
 use RcmMessage\Api\PrepareMessageForDisplay;
 use Zend\Mvc\Controller\ControllerManager;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -30,7 +30,7 @@ class ApiUserMessageControllerFactory
 
         $controller = new ApiUserMessageController(
             $serviceContainer->get(EntityManager::class),
-            $serviceContainer->get(IsAllowedRcmUserSitesAdmin::class),
+//            $serviceContainer->get(IsAllowedRcmUserSitesAdmin::class),
             $serviceContainer->get(GetServerRequest::class),
             $serviceContainer->get(GetCurrentUserId::class),
             $serviceContainer->get(PrepareMessageForDisplay::class),

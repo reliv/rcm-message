@@ -20,29 +20,29 @@ use Reliv\RcmApiLib\Controller\AbstractRestfulJsonController;
 class ApiUserMessageController extends AbstractRestfulJsonController
 {
     protected $entityManager;
-    protected $isAllowed;
+//    protected $isAllowed;
     protected $getServerRequest;
     protected $getCurrentUserId;
     protected $prepareMessageForDisplay;
     protected $isAllowedOptions;
 
     /**
-     * @param EntityManager    $entityManager
-     * @param IsAllowed        $isAllowed
+     * @param EntityManager $entityManager
+     * @param IsAllowed $isAllowed
      * @param GetServerRequest $getServerRequest
      * @param GetCurrentUserId $getCurrentUserId
-     * @param array            $isAllowedOptions
+     * @param array $isAllowedOptions
      */
     public function __construct(
         EntityManager $entityManager,
-        IsAllowed $isAllowed,
+//        IsAllowed $isAllowed,
         GetServerRequest $getServerRequest,
         GetCurrentUserId $getCurrentUserId,
         PrepareMessageForDisplay $prepareMessageForDisplay,
         $isAllowedOptions = []
     ) {
         $this->entityManager = $entityManager;
-        $this->isAllowed = $isAllowed;
+//        $this->isAllowed = $isAllowed;
         $this->getServerRequest = $getServerRequest;
         $this->getCurrentUserId = $getCurrentUserId;
         $this->prepareMessageForDisplay = $prepareMessageForDisplay;
@@ -73,7 +73,7 @@ class ApiUserMessageController extends AbstractRestfulJsonController
 
     /**
      * @param UserMessageInterface $userMessage
-     * @param array                $options
+     * @param array $options
      *
      * @return UserMessageInterface
      */
@@ -117,11 +117,14 @@ class ApiUserMessageController extends AbstractRestfulJsonController
             return true;
         }
 
-        // ACCESS CHECK if not current user
-        return $this->isAllowed->__invoke(
-            $serverRequest,
-            $this->isAllowedOptions
-        );
+        //This was disabled durring the ACl2 project because it doesn't seem to be used.
+//        // ACCESS CHECK if not current user
+//        return $this->isAllowed->__invoke(
+//            $serverRequest,
+//            $this->isAllowedOptions
+//        );
+
+        return false;
     }
 
     /**
@@ -266,7 +269,7 @@ class ApiUserMessageController extends AbstractRestfulJsonController
      * update
      *
      * @param string $id
-     * @param mixed  $data
+     * @param mixed $data
      *
      * @return \Reliv\RcmApiLib\Http\ApiResponse|\Reliv\RcmApiLib\Http\ApiResponseInterface
      * @throws \Doctrine\ORM\OptimisticLockException
