@@ -18,7 +18,7 @@
       "homepage": "https://github.com/reliv"
     }
   ],
-  "require": {
+  "require-comented-out": {
     "php": ">=5.5",
     "doctrine/doctrine-orm-module": "0.* || 1.*",
     "psr/http-message": "^1.0.1",
